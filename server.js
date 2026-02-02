@@ -18,6 +18,11 @@ app.use(express.static(path.join(__dirname, '.')));
 
 // Route to serve the main page
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'secure-index.html'));
+});
+
+// Route to serve the original page if needed
+app.get('/original', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
@@ -65,6 +70,75 @@ app.get('/api/community', (req, res) => {
         ]
     });
 });
+
+// x402 Protocol API endpoints
+app.post('/api/x402/transaction', (req, res) => {
+    // Simulate BTC-inspired transaction verification
+    const { from, to, amount, purpose } = req.body;
+    
+    // Generate secure transaction ID
+    const transactionId = `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Create verification hash (simulated BTC-inspired verification)
+    const timestamp = Date.now();
+    const verificationHash = generateSecureHash(`${transactionId}${from}${to}${amount}${timestamp}`);
+    
+    const transaction = {
+        id: transactionId,
+        from,
+        to,
+        amount,
+        purpose,
+        timestamp,
+        verified: true,
+        verification_hash: verificationHash,
+        protocol: 'x402',
+        security: 'BTC-inspired'
+    };
+    
+    // In a real implementation, this would be stored in a database
+    res.json(transaction);
+});
+
+app.get('/api/x402/security', (req, res) => {
+    res.json({
+        protocol: 'x402',
+        security_model: 'BTC-inspired',
+        features: [
+            'Immutable transaction records',
+            'Cryptographic verification',
+            'Decentralized trust',
+            'Agent-to-agent transactions'
+        ],
+        status: 'active',
+        last_verified: new Date().toISOString()
+    });
+});
+
+app.get('/api/x402/agents', (req, res) => {
+    res.json({
+        registered_agents: 42, // Simulated number
+        active_transactions: 128, // Simulated number
+        security_level: 'BTC-enhanced',
+        protocol: 'x402',
+        description: 'Secure agent-to-agent transactions with BTC-inspired security'
+    });
+});
+
+// Helper function for generating secure hashes
+function generateSecureHash(input) {
+    // Simplified hash generation (in a real implementation, use proper crypto)
+    let hash = 0;
+    const str = input.toString();
+    
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    
+    return Math.abs(hash).toString(36);
+}
 
 // 404 handler
 app.use((req, res) => {

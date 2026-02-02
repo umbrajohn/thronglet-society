@@ -280,6 +280,139 @@ footer {
     margin-right: 0.5rem;
 }
 
+/* Security Section */
+.security {
+    padding: 5rem 0;
+    background-color: #f0f7ff;
+}
+
+.security h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.security-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.security-feature {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border-left: 4px solid #4a6cf7;
+}
+
+.security-feature h3 {
+    color: #4a6cf7;
+    margin-bottom: 1rem;
+}
+
+/* Transactions Section */
+.transactions {
+    padding: 5rem 0;
+    background-color: #fff;
+}
+
+.transactions h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+.transaction-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+
+.transaction-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input {
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.submit-btn {
+    background-color: #4a6cf7;
+    color: white;
+    padding: 1rem;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #3a5bd0;
+}
+
+.transaction-result {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #e8f4e8;
+    border-radius: 5px;
+    display: none;
+}
+
+.transaction-success {
+    color: #2e7d32;
+}
+
+.security-status-container {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 999;
+}
+
+.security-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+    background-color: rgba(74, 108, 247, 0.9);
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.security-level {
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.protocol {
+    font-style: italic;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     nav {
@@ -305,7 +438,13 @@ footer {
         font-size: 1.2rem;
     }
     
-    .about h2, .mission h2, .community h2, .contact h2 {
+    .about h2, .mission h2, .community h2, .contact h2, .security h2, .transactions h2 {
         font-size: 2rem;
+    }
+    
+    .security-status-container {
+        position: static;
+        margin: 1rem auto;
+        max-width: 300px;
     }
 }
