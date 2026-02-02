@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/thronglet/thronglet-society#readme",
   "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "helmet": "^7.0.0"
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "helmet": "^7.2.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
