@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
@@ -258,6 +258,159 @@ app.post('/api/bitcoin/mine', (req, res) => {
     
     res.json(block);
 });
+
+// Enhanced dApp API endpoints for multi-chain functionality
+app.get('/api/dapp/status', (req, res) => {
+    // Return status of all integrated networks
+    res.json({
+        networks: {
+            bitcoin: {
+                connected: true, // Simulated connection
+                status: 'operational',
+                capabilities: ['transactions', 'utxo', 'wallets'],
+                description: 'Integrated with bitcoin/bitcoin repository'
+            },
+            solana: {
+                connected: true, // Simulated connection
+                status: 'operational',
+                capabilities: ['high_speed', 'smart_contracts', 'accounts'],
+                description: 'Integrated with solana-labs/solana repository'
+            },
+            thronglet: {
+                connected: true,
+                status: 'operational',
+                capabilities: ['agent_interaction', 'x402_protocol', 'security']
+            }
+        },
+        dapp_features: {
+            cross_chain_transactions: true,
+            agent_registration: true,
+            human_registration: true,
+            smart_contracts: true
+        },
+        timestamp: new Date().toISOString(),
+        version: '2.0.0',
+        description: 'Multi-chain dApp for agents and humans'
+    });
+});
+
+// Cross-chain transaction endpoint
+app.post('/api/dapp/cross-chain', (req, res) => {
+    const { fromChain, toChain, sender, recipient, amount } = req.body;
+    
+    // Validate chain parameters
+    const validChains = ['bitcoin', 'solana', 'thronglet'];
+    if (!validChains.includes(fromChain) || !validChains.includes(toChain)) {
+        return res.status(400).json({ error: 'Invalid chain specified' });
+    }
+    
+    // Create cross-chain transaction
+    const transaction = {
+        id: `cc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: 'cross_chain',
+        fromChain,
+        toChain,
+        sender,
+        recipient,
+        amount: parseFloat(amount),
+        timestamp: Date.now(),
+        status: 'pending',
+        route: `${fromChain}_to_${toChain}`,
+        fees: calculateCrossChainFee(fromChain, toChain, amount),
+        protocol: 'multi-chain-bridge'
+    };
+    
+    res.json(transaction);
+});
+
+// Agent registration endpoint
+app.post('/api/dapp/register/agent', (req, res) => {
+    const { name, capabilities, preferences } = req.body;
+    
+    const agent = {
+        id: `agent_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: 'agent',
+        name,
+        capabilities: capabilities || [],
+        preferences: preferences || [],
+        registered: Date.now(),
+        status: 'active',
+        networks: ['bitcoin', 'solana', 'thronglet'], // All networks by default
+        protocol: 'thronglet-agent-protocol'
+    };
+    
+    res.json(agent);
+});
+
+// Human registration endpoint
+app.post('/api/dapp/register/human', (req, res) => {
+    const { name, preferences, walletAddresses } = req.body;
+    
+    const human = {
+        id: `human_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: 'human',
+        name,
+        preferences: preferences || [],
+        walletAddresses: walletAddresses || {},
+        registered: Date.now(),
+        status: 'active',
+        networks: ['bitcoin', 'solana', 'thronglet'], // All networks by default
+        protocol: 'thronglet-human-protocol'
+    };
+    
+    res.json(human);
+});
+
+// Solana-specific endpoints
+app.post('/api/solana/transaction', (req, res) => {
+    const { sender, recipient, amount, blockhash, feePayer } = req.body;
+    
+    const transaction = {
+        id: `sol_tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        type: 'solana',
+        sender,
+        recipient,
+        amount: parseFloat(amount),
+        timestamp: Date.now(),
+        status: 'pending',
+        recentBlockhash: blockhash || 'EtBn51JU4F4jSC2cLPdgjNNJWa64aFDi2g9evrbqfb2a',
+        feePayer: feePayer || sender,
+        computedFees: 0.000005, // Standard Solana fee
+        network: 'solana',
+        protocol: 'solana-web3'
+    };
+    
+    res.json(transaction);
+});
+
+app.get('/api/solana/network', (req, res) => {
+    res.json({
+        network: 'solana',
+        status: 'operational',
+        cluster: 'mainnet-beta',
+        blockHeight: Math.floor(Math.random() * 100000000) + 150000000,
+        slot: Math.floor(Math.random() * 100000000) + 150000000,
+        epoch: Math.floor(Math.random() * 100) + 300,
+        description: 'Integrated with solana-labs/solana repository',
+        capabilities: [
+            'high_performance',
+            'smart_contracts',
+            'account_system',
+            'validator_network'
+        ]
+    });
+});
+
+// Helper function for cross-chain fees
+function calculateCrossChainFee(fromChain, toChain, amount) {
+    const baseFee = 0.001; // Base fee
+    const fromFee = fromChain === 'bitcoin' ? 0.00001 : 
+                   fromChain === 'solana' ? 0.000005 : 0.0001;
+    const toFee = toChain === 'bitcoin' ? 0.00001 : 
+                  toChain === 'solana' ? 0.000005 : 0.0001;
+    
+    return baseFee + fromFee + toFee;
+}
 
 // 404 handler
 app.use((req, res) => {

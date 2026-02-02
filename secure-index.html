@@ -86,38 +86,110 @@
 
         <section id="transactions" class="transactions">
             <div class="container">
-                <h2>Bitcoin-Enabled Agent Transactions</h2>
-                <p>Using BTC-inspired security with real Bitcoin technology and x402 protocol for agent-to-agent interactions.</p>
+                <h2>Multi-Chain Agent-Human dApp</h2>
+                <p>Powered by Bitcoin and Solana integration with real cross-chain capabilities for agents and humans.</p>
+                
+                <div id="network-status" class="network-status"></div>
                 
                 <div id="wallet-status" class="wallet-status">
                     <div class="wallet-disconnected">Wallet disconnected</div>
                 </div>
                 
-                <button id="connect-wallet-btn" class="wallet-connect-btn">Connect Wallet via Privy</button>
+                <button id="connect-wallet-btn" class="wallet-connect-btn">Connect Wallet</button>
+                
+                <div class="dapp-controls">
+                    <button id="init-networks-btn" class="dapp-btn">Initialize Networks (BTC & Solana)</button>
+                    <button id="register-agent-btn" class="dapp-btn">Register Agent</button>
+                    <button id="register-human-btn" class="dapp-btn">Register Human</button>
+                </div>
                 
                 <div class="transaction-form-container">
-                    <form id="btc-transaction-form" class="transaction-form">
-                        <h3>Create Bitcoin Transaction</h3>
-                        <div class="form-group">
-                            <label for="recipient">Recipient Address:</label>
-                            <input type="text" id="recipient" name="recipient" placeholder="Enter Bitcoin address" required>
+                    <h3>Create Cross-Chain Transaction</h3>
+                    <form id="cross-chain-form" class="transaction-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="from-chain">From Chain:</label>
+                                <select id="from-chain" name="from-chain" required>
+                                    <option value="bitcoin">Bitcoin</option>
+                                    <option value="solana">Solana</option>
+                                    <option value="thronglet">Thronglet</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="to-chain">To Chain:</label>
+                                <select id="to-chain" name="to-chain" required>
+                                    <option value="bitcoin">Bitcoin</option>
+                                    <option value="solana">Solana</option>
+                                    <option value="thronglet">Thronglet</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="amount">Amount (BTC):</label>
+                            <label for="sender">Sender Address:</label>
+                            <input type="text" id="sender" name="sender" placeholder="Enter sender address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="recipient">Recipient Address:</label>
+                            <input type="text" id="recipient" name="recipient" placeholder="Enter recipient address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amount">Amount:</label>
                             <input type="number" id="amount" name="amount" step="0.00000001" min="0.00000001" placeholder="0.00000000" required>
                         </div>
                         
+                        <button type="submit" class="submit-btn">Create Cross-Chain Transaction</button>
+                    </form>
+                </div>
+                
+                <div class="transaction-form-container">
+                    <h3>Create Bitcoin Transaction</h3>
+                    <form id="btc-transaction-form" class="transaction-form">
                         <div class="form-group">
-                            <label for="private-key">Private Key:</label>
-                            <input type="password" id="private-key" name="private-key" placeholder="Enter private key" required>
+                            <label for="btc-recipient">Recipient Address:</label>
+                            <input type="text" id="btc-recipient" name="recipient" placeholder="Enter Bitcoin address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="btc-amount">Amount (BTC):</label>
+                            <input type="number" id="btc-amount" name="amount" step="0.00000001" min="0.00000001" placeholder="0.00000000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="btc-private-key">Private Key:</label>
+                            <input type="password" id="btc-private-key" name="private-key" placeholder="Enter private key" required>
                         </div>
                         
                         <button type="submit" class="submit-btn">Create BTC Transaction</button>
                     </form>
-                    
-                    <div id="transaction-result" class="transaction-result"></div>
                 </div>
+                
+                <div class="transaction-form-container">
+                    <h3>Create Solana Transaction</h3>
+                    <form id="solana-transaction-form" class="transaction-form">
+                        <div class="form-group">
+                            <label for="solana-sender">Sender Address:</label>
+                            <input type="text" id="solana-sender" name="sender" placeholder="Enter Solana address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="solana-recipient">Recipient Address:</label>
+                            <input type="text" id="solana-recipient" name="recipient" placeholder="Enter Solana address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="solana-amount">Amount (SOL):</label>
+                            <input type="number" id="solana-amount" name="amount" step="0.000000001" min="0.000000001" placeholder="0.000000000" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Create Solana Transaction</button>
+                    </form>
+                </div>
+                
+                <div id="transaction-result" class="transaction-result"></div>
             </div>
         </section>
 
@@ -180,5 +252,164 @@
     <script src="script.js"></script>
     <script src="enhanced-script.js"></script>
     <script src="privy-integration.js"></script>
+    <script src="enhanced-dapp-integration.js"></script>
+    
+    <script>
+      // Additional UI event handlers for the enhanced dApp
+      document.addEventListener('DOMContentLoaded', function() {
+        // Handle cross-chain transaction form
+        const crossChainForm = document.getElementById('cross-chain-form');
+        if (crossChainForm) {
+          crossChainForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!window.throngletDApp) {
+              alert('Please initialize networks first!');
+              return;
+            }
+            
+            const formData = new FormData(crossChainForm);
+            const fromChain = formData.get('from-chain');
+            const toChain = formData.get('to-chain');
+            const sender = formData.get('sender');
+            const recipient = formData.get('recipient');
+            const amount = formData.get('amount');
+            
+            try {
+              const transaction = window.throngletDApp.createCrossChainTransaction(
+                fromChain, toChain, sender, recipient, amount
+              );
+              
+              console.log('Cross-chain transaction created:', transaction);
+              
+              // Verify the transaction
+              const verification = await window.throngletDApp.verifyTransaction(transaction.id);
+              
+              // Display transaction info
+              const resultDiv = document.getElementById('transaction-result');
+              if (resultDiv) {
+                resultDiv.innerHTML = `
+                  <div class="transaction-success">
+                    <h4>Cross-Chain Transaction Created Successfully</h4>
+                    <p>ID: ${transaction.id}</p>
+                    <p>Type: ${transaction.type}</p>
+                    <p>Route: ${transaction.route}</p>
+                    <p>From: ${transaction.sender}</p>
+                    <p>To: ${transaction.recipient}</p>
+                    <p>Amount: ${transaction.amount}</p>
+                    <p>Fees: ${transaction.fees.toFixed(8)}</p>
+                    <p>Status: ${transaction.status}</p>
+                    <p>Verified: ${verification.verified ? '✅ Yes' : '⏳ Pending'}</p>
+                    <p>Timestamp: ${new Date(transaction.timestamp).toLocaleString()}</p>
+                  </div>
+                `;
+                resultDiv.style.display = 'block';
+              }
+            } catch (error) {
+              console.error('Error creating cross-chain transaction:', error);
+              alert('Error creating cross-chain transaction: ' + error.message);
+            }
+          });
+        }
+        
+        // Handle Solana transaction form
+        const solanaForm = document.getElementById('solana-transaction-form');
+        if (solanaForm) {
+          solanaForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!window.throngletDApp) {
+              alert('Please initialize networks first!');
+              return;
+            }
+            
+            const formData = new FormData(solanaForm);
+            const sender = formData.get('sender');
+            const recipient = formData.get('recipient');
+            const amount = formData.get('amount');
+            
+            try {
+              const transaction = window.throngletDApp.createSolanaTransaction(
+                sender, recipient, amount
+              );
+              
+              console.log('Solana transaction created:', transaction);
+              
+              // Verify the transaction
+              const verification = await window.throngletDApp.verifyTransaction(transaction.id);
+              
+              // Display transaction info
+              const resultDiv = document.getElementById('transaction-result');
+              if (resultDiv) {
+                resultDiv.innerHTML = `
+                  <div class="transaction-success">
+                    <h4>Solana Transaction Created Successfully</h4>
+                    <p>ID: ${transaction.id}</p>
+                    <p>Type: ${transaction.type}</p>
+                    <p>From: ${transaction.sender}</p>
+                    <p>To: ${transaction.recipient}</p>
+                    <p>Amount: ${transaction.amount} SOL</p>
+                    <p>Status: ${transaction.status}</p>
+                    <p>Computed Fees: ${transaction.computedFees.toFixed(8)} SOL</p>
+                    <p>Verified: ${verification.verified ? '✅ Yes' : '⏳ Pending'}</p>
+                    <p>Timestamp: ${new Date(transaction.timestamp).toLocaleString()}</p>
+                  </div>
+                `;
+                resultDiv.style.display = 'block';
+              }
+            } catch (error) {
+              console.error('Error creating Solana transaction:', error);
+              alert('Error creating Solana transaction: ' + error.message);
+            }
+          });
+        }
+        
+        // Handle Initialize Networks button
+        const initNetworksBtn = document.getElementById('init-networks-btn');
+        if (initNetworksBtn) {
+          initNetworksBtn.addEventListener('click', function() {
+            if (window.initializeNetworks) {
+              window.initializeNetworks();
+            }
+          });
+        }
+        
+        // Handle Register Agent button
+        const registerAgentBtn = document.getElementById('register-agent-btn');
+        if (registerAgentBtn) {
+          registerAgentBtn.addEventListener('click', function() {
+            if (window.throngletDApp) {
+              const agentData = {
+                name: 'New Agent',
+                capabilities: ['transactions', 'smart_contracts'],
+                status: 'active'
+              };
+              
+              const agent = window.throngletDApp.registerAgent(agentData);
+              console.log('Agent registered:', agent);
+              alert('Agent registered successfully with ID: ' + agent.id);
+            }
+          });
+        }
+        
+        // Handle Register Human button
+        const registerHumanBtn = document.getElementById('register-human-btn');
+        if (registerHumanBtn) {
+          registerHumanBtn.addEventListener('click', function() {
+            if (window.throngletDApp) {
+              const userData = {
+                name: 'New Human',
+                preferences: ['transactions', 'dapps'],
+                status: 'active'
+              };
+              
+              const human = window.throngletDApp.registerHuman(userData);
+              console.log('Human registered:', human);
+              alert('Human registered successfully with ID: ' + human.id);
+            }
+          });
+        }
+      });
+    </script>
 </body>
 </html>

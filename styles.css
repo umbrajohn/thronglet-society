@@ -416,6 +416,76 @@ footer {
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
 }
 
+/* dApp Controls */
+.dapp-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.dapp-btn {
+    padding: 0.75rem 1.25rem;
+    background-color: #6a11cb;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dapp-btn:hover {
+    background-color: #4a0da3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Network Status */
+.network-status {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: #f0f4ff;
+    border-radius: 10px;
+}
+
+.connection-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.connection {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.connection.connected {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.connection.disconnected {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+/* Form Row for Side-by-Side Elements */
+.form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Transaction Result */
 .transaction-result {
     margin-top: 2rem;
     padding: 1rem;
@@ -455,6 +525,28 @@ footer {
 
 .protocol {
     font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .dapp-controls {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .dapp-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    .connection-indicators {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 /* Responsive Design */
