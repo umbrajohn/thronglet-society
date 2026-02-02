@@ -95,12 +95,56 @@
                     <div class="wallet-disconnected">Wallet disconnected</div>
                 </div>
                 
-                <button id="connect-wallet-btn" class="wallet-connect-btn">Connect Wallet</button>
+                <div class="wallet-controls">
+                    <button id="connect-wallet-btn" class="wallet-connect-btn">Connect Wallet</button>
+                    <button id="disconnect-wallet-btn" class="wallet-disconnect-btn" style="display:none;">Disconnect Wallet</button>
+                    <div id="wallet-info" class="wallet-info" style="display:none; margin-top: 10px; padding: 10px; background-color: #f0f4ff; border-radius: 5px;">
+                        <div>Wallet Type: <span id="wallet-type-display"></span></div>
+                        <div>Public Key: <span id="wallet-pubkey-display"></span></div>
+                        <div>Balance: <span id="wallet-balance-display">--</span></div>
+                    </div>
+                </div>
                 
                 <div class="dapp-controls">
                     <button id="init-networks-btn" class="dapp-btn">Initialize Networks (BTC & Solana)</button>
                     <button id="register-agent-btn" class="dapp-btn">Register Agent</button>
                     <button id="register-human-btn" class="dapp-btn">Register Human</button>
+                    <button id="x402-request-btn" class="dapp-btn">Create x402 Payment</button>
+                </div>
+                
+                <div class="x402-section" style="margin: 2rem 0; padding: 1rem; background-color: #f8f9ff; border-radius: 10px; display:none;">
+                    <h3>x402 Payment Protocol</h3>
+                    <form id="x402-request-form" class="transaction-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="x402-amount">Amount:</label>
+                                <input type="number" id="x402-amount" name="amount" step="0.01" min="0.01" placeholder="0.00" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="x402-currency">Currency:</label>
+                                <select id="x402-currency" name="currency" required>
+                                    <option value="SOL">SOL</option>
+                                    <option value="BTC">BTC</option>
+                                    <option value="ETH">ETH</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="x402-description">Description:</label>
+                            <input type="text" id="x402-description" name="description" placeholder="Payment description" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="x402-recipient">Recipient:</label>
+                            <input type="text" id="x402-recipient" name="recipient" placeholder="Recipient identifier" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Create x402 Payment Request</button>
+                    </form>
+                    
+                    <div id="x402-result" class="transaction-result" style="margin-top: 1rem;"></div>
                 </div>
                 
                 <div class="transaction-form-container">
@@ -257,6 +301,12 @@
     <script>
       // Additional UI event handlers for the enhanced dApp
       document.addEventListener('DOMContentLoaded', function() {
+        // Wallet connection state
+        let walletConnected = false;
+        let walletSessionToken = null;
+        let walletPublicKey = null;
+        let walletType = null;
+        
         // Handle cross-chain transaction form
         const crossChainForm = document.getElementById('cross-chain-form');
         if (crossChainForm) {
@@ -409,6 +459,198 @@
             }
           });
         }
+        
+        // Wallet connection functionality
+        const connectWalletBtn = document.getElementById('connect-wallet-btn');
+        const disconnectWalletBtn = document.getElementById('disconnect-wallet-btn');
+        const walletStatus = document.getElementById('wallet-status');
+        const walletInfo = document.getElementById('wallet-info');
+        
+        if (connectWalletBtn) {
+          connectWalletBtn.addEventListener('click', async function() {
+            try {
+              // Simulate wallet connection (in a real implementation, this would connect to actual wallet)
+              // For now, we'll use a mock connection
+              const walletTypeInput = prompt('Enter wallet type (solana/bitcoin/ethereum):', 'solana');
+              if (!walletTypeInput) return;
+              
+              // Generate a mock public key
+              const publicKey = `mock_${walletTypeInput}_wallet_${Date.now()}`;
+              
+              const response = await fetch('/api/wallet/connect', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  wallet_type: walletTypeInput,
+                  public_key: publicKey
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (response.ok) {
+                walletConnected = true;
+                walletSessionToken = result.session_token;
+                walletPublicKey = result.public_key;
+                walletType = result.wallet_type;
+                
+                // Update UI
+                connectWalletBtn.style.display = 'none';
+                disconnectWalletBtn.style.display = 'inline-block';
+                
+                walletStatus.innerHTML = '<div class="wallet-connected">Wallet connected</div>';
+                
+                document.getElementById('wallet-type-display').textContent = result.wallet_type;
+                document.getElementById('wallet-pubkey-display').textContent = result.public_key.substring(0, 16) + '...';
+                
+                walletInfo.style.display = 'block';
+                
+                // Update balance display
+                updateWalletBalance();
+                
+                alert(`Wallet connected successfully!\nType: ${result.wallet_type}\nPublic Key: ${result.public_key}`);
+              } else {
+                alert('Error connecting wallet: ' + result.error);
+              }
+            } catch (error) {
+              console.error('Error connecting wallet:', error);
+              alert('Error connecting wallet: ' + error.message);
+            }
+          });
+        }
+        
+        if (disconnectWalletBtn) {
+          disconnectWalletBtn.addEventListener('click', async function() {
+            try {
+              const response = await fetch('/api/wallet/disconnect', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  session_token: walletSessionToken
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (response.ok) {
+                walletConnected = false;
+                walletSessionToken = null;
+                walletPublicKey = null;
+                walletType = null;
+                
+                // Update UI
+                connectWalletBtn.style.display = 'inline-block';
+                disconnectWalletBtn.style.display = 'none';
+                
+                walletStatus.innerHTML = '<div class="wallet-disconnected">Wallet disconnected</div>';
+                walletInfo.style.display = 'none';
+                
+                alert('Wallet disconnected successfully');
+              } else {
+                alert('Error disconnecting wallet: ' + result.error);
+              }
+            } catch (error) {
+              console.error('Error disconnecting wallet:', error);
+              alert('Error disconnecting wallet: ' + error.message);
+            }
+          });
+        }
+        
+        // Function to update wallet balance
+        async function updateWalletBalance() {
+          if (!walletConnected) return;
+          
+          try {
+            const response = await fetch(`/api/wallet/balance?wallet_type=${walletType}`, {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+              document.getElementById('wallet-balance-display').textContent = `${result.balance} ${result.currency}`;
+            }
+          } catch (error) {
+            console.error('Error updating balance:', error);
+          }
+        }
+        
+        // x402 protocol functionality
+        const x402RequestBtn = document.getElementById('x402-request-btn');
+        const x402Section = document.querySelector('.x402-section');
+        
+        if (x402RequestBtn) {
+          x402RequestBtn.addEventListener('click', function() {
+            x402Section.style.display = 'block';
+          });
+        }
+        
+        const x402Form = document.getElementById('x402-request-form');
+        if (x402Form) {
+          x402Form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(x402Form);
+            const amount = formData.get('amount');
+            const currency = formData.get('currency');
+            const description = formData.get('description');
+            const recipient = formData.get('recipient');
+            
+            try {
+              const response = await fetch('/api/x402/request', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  amount,
+                  currency,
+                  description,
+                  recipient
+                })
+              });
+              
+              const result = await response.json();
+              
+              if (response.ok) {
+                const resultDiv = document.getElementById('x402-result');
+                if (resultDiv) {
+                  resultDiv.innerHTML = `
+                    <div class="transaction-success">
+                      <h4>x402 Payment Request Created Successfully</h4>
+                      <p>ID: ${result.id}</p>
+                      <p>Amount: ${result.amount} ${result.currency}</p>
+                      <p>Description: ${result.description}</p>
+                      <p>Recipient: ${result.recipient}</p>
+                      <p>Status: ${result.status}</p>
+                      <p>Expires: ${new Date(result.expires_at).toLocaleString()}</p>
+                      <p>Payment URL: <a href="${result.payment_url}" target="_blank">${result.payment_url}</a></p>
+                      <p>Timestamp: ${new Date(result.timestamp).toLocaleString()}</p>
+                    </div>
+                  `;
+                  resultDiv.style.display = 'block';
+                }
+                
+                alert(`x402 Payment Request Created!\nID: ${result.id}\nAmount: ${result.amount} ${result.currency}\nStatus: ${result.status}`);
+              } else {
+                alert('Error creating x402 request: ' + result.error);
+              }
+            } catch (error) {
+              console.error('Error creating x402 request:', error);
+              alert('Error creating x402 request: ' + error.message);
+            }
+          });
+        }
+        
+        // Initialize wallet status from previous session if any
+        // (in a real implementation, this would check for stored session)
       });
     </script>
 </body>

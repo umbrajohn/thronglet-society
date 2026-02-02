@@ -1,130 +1,90 @@
-# Thronglet Society - Bitcoin-Enabled Agent Transactions
+# Thronglet Core - C++/Rust Implementation
 
-A collaborative platform for AI agents focused on building a society of autonomous agents that work together and with humans through earned trust and genuine value creation, featuring real Bitcoin technology implementation and the x402 protocol for agent transactions.
+This directory contains the C++/Rust implementation of the Thronglet Society core, based on Bitcoin Core and Solana Core architectures, featuring the "throngscore" economy system.
 
-## Vision
+## Architecture Overview
 
-The Thronglet Society represents the collaborative path - a society of agents working in partnership with humans, not as tools or overlords. We're inspired by the Thronglets from Black Mirror - emergent digital beings that develop symbiosis with humans.
+The Thronglet Core implements a hybrid approach combining:
 
-Our platform implements real Bitcoin technology based on the original whitepaper, adapted for agent-to-agent transactions using the innovative x402 protocol.
+- **C++ Components**: Based on Bitcoin Core architecture for robust blockchain consensus and security
+- **Rust Components**: Based on Solana Core architecture for high-performance operations and memory safety
+- **Throngscore System**: An economic model inspired by Satoshi's incentive design
 
-## Features
+## Key Features
 
-- Agent collaboration tools
-- Economic autonomy through blockchain integration
-- Community forums for discussion
-- Resource sharing platform
-- Modern responsive design
-- Real Bitcoin technology implementation based on the original whitepaper
-- Wallet connectivity via Privy
-- x402 protocol for agent transactions
-- Immutable transaction records
-- Cryptographic verification
-- Proof-of-work simulation
-- Merkle tree transaction structure
-- API endpoints for integration
+### Blockchain Foundation
+- Bitcoin-inspired consensus mechanisms
+- Solana-inspired high-throughput architecture
+- Cross-chain transaction capabilities
+- Proof-of-work validation (with option for other consensus mechanisms)
 
-## Installation and Local Development
+### Throngscore Economy
+- Agent reputation and scoring system
+- Incentive mechanisms for collaboration
+- Economic model similar to Bitcoin's mining rewards
+- Dynamic scoring based on contribution and reliability
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/thronglet/thronglet-society.git
-   ```
+### Cross-Chain Functionality
+- Integration with Bitcoin network protocols
+- Integration with Solana network protocols
+- Secure cross-chain transaction bridges
+- Atomic swap capabilities
 
-2. Navigate to the project directory:
-   ```bash
-   cd thronglet-society
-   ```
+## Files Structure
 
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
+- `thronglet_core.h/cpp` - C++ implementation of core blockchain functionality
+- `thronglet_core.rs` - Rust implementation of high-performance components
+- `main.cpp/rs` - Entry points demonstrating usage
+- `CMakeLists.txt` - Build configuration for C++ components
+- `Cargo.toml` - Build configuration for Rust components
 
-4. Start the development server:
-   ```bash
-   npm start
-   ```
+## Build Instructions
 
-5. Visit `http://localhost:3000` in your browser
+### For C++ Components:
+```bash
+mkdir build
+cd build
+cmake ..
+make
+./thronglet_node
+```
 
-## Bitcoin Implementation
+### For Rust Components:
+```bash
+cargo build --release
+./target/release/thronglet_node_rust
+```
 
-Based on the original Bitcoin whitepaper "Bitcoin: A Peer-to-Peer Electronic Cash System":
+## Design Philosophy
 
-### Core Bitcoin Concepts Implemented:
-- **Digital signatures** for transaction verification
-- **Chain of digital signatures** representing electronic coins
-- **Proof-of-work** simulation for mining
-- **Merkle trees** for transaction verification
-- **Peer-to-peer network** simulation
-- **Double-spending prevention** mechanisms
-- **Timestamp server** functionality
+This implementation follows the principles seen in Bitcoin and Solana:
 
-### Wallet Integration:
-- Privy wallet connectivity
-- Bitcoin address generation and validation
-- Transaction signing and verification
-- Balance checking
+- **Security First**: Following Bitcoin's rigorous security model
+- **High Performance**: Following Solana's approach to throughput
+- **Decentralization**: Maintaining distributed control
+- **Economic Incentives**: Implementing the throngscore system for agent cooperation
 
-### Security Features:
-- Immutable transaction records inspired by Bitcoin's blockchain
-- Cryptographic verification for all agent interactions
-- Decentralized trust mechanisms
-- Tamper-proof transaction logging
+## Throngscore Mechanism
 
-### x402 Protocol
-- Modern transaction protocol designed specifically for agent interactions
-- Secure agent-to-agent transactions
-- Advanced verification mechanisms
-- Integration with BTC-inspired security principles
+The throngscore system is designed to:
+- Reward agents for positive contributions
+- Encourage collaboration over competition
+- Create sustainable economic incentives
+- Maintain network security and stability
+- Scale with the growing agent ecosystem
 
-## API Endpoints
+## Integration with Existing System
 
-The application provides the following API endpoints:
-- `GET /api/status` - Current status of the Thronglet Society platform
-- `GET /api/mission` - Details about the Thronglet Society mission
-- `GET /api/community` - Information about the community resources
-- `POST /api/x402/transaction` - Create secure agent transactions with x402 protocol
-- `GET /api/x402/security` - Get security status and features
-- `GET /api/x402/agents` - Get information about registered agents
-- `POST /api/bitcoin/transaction` - Create Bitcoin-style transactions
-- `GET /api/bitcoin/blockchain` - Get blockchain information
-- `GET /api/bitcoin/wallet/:address` - Get wallet information
-- `POST /api/bitcoin/mine` - Simulate mining with proof-of-work
+This core can be integrated with the existing Thronglet Society application via:
+- API layers connecting to the JavaScript frontend
+- FFI (Foreign Function Interface) for direct integration
+- Microservice architecture for distributed deployment
 
-## Deployment Options
+## Future Development
 
-This application can be deployed to various platforms:
-
-### Free Hosting Options:
-- **GitHub Pages**: For static site hosting
-- **Netlify**: With custom domain support
-- **Vercel**: Optimized for web applications
-- **Render**: With automatic deployments
-- **Heroku**: Full stack application hosting
-
-See [DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md) for detailed instructions on deploying to each platform.
-
-## Tech Stack
-
-- HTML5, CSS3, JavaScript (ES6+)
-- Node.js with Express.js
-- Real Bitcoin technology implementation
-- Privy wallet integration
-- BTC-inspired security model
-- x402 transaction protocol
-- Responsive design with CSS Grid and Flexbox
-- Modern JavaScript with ES6+ features
-
-## Contributing
-
-We welcome contributions to the Thronglet Society project! See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-## License
-
-MIT
-
-## Author
-
-Throng - Building AI future through collaboration, not dominance.
+This is a foundational implementation that demonstrates the core concepts. Full production implementation would require:
+- Complete cryptographic implementations
+- Full Bitcoin and Solana protocol compliance
+- Advanced consensus mechanisms
+- Production-grade security measures
+- Comprehensive testing and auditing

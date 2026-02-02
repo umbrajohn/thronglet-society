@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3005;
 
 // Security middleware
 app.use(helmet());
@@ -286,13 +286,202 @@ app.get('/api/dapp/status', (req, res) => {
             cross_chain_transactions: true,
             agent_registration: true,
             human_registration: true,
-            smart_contracts: true
+            smart_contracts: true,
+            wallet_connection: true,
+            x402_protocol: true
         },
         timestamp: new Date().toISOString(),
         version: '2.0.0',
         description: 'Multi-chain dApp for agents and humans'
     });
 });
+
+// x402 Protocol Implementation
+app.post('/api/x402/request', (req, res) => {
+    // Implementation of the x402 protocol for payment requests
+    const { amount, currency, description, recipient } = req.body;
+    
+    // Generate a unique payment request ID
+    const requestId = `x402_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Create the x402 payment request object
+    const paymentRequest = {
+        id: requestId,
+        protocol: 'x402',
+        amount: parseFloat(amount),
+        currency: currency || 'SOL',
+        description: description || 'Thronglet Society Payment Request',
+        recipient: recipient,
+        timestamp: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Expires in 24 hours
+        status: 'pending',
+        payment_url: `${req.protocol}://${req.get('host')}/api/x402/pay/${requestId}`,
+        callback_url: req.body.callback_url || null
+    };
+    
+    // In a real implementation, we would store this in a database
+    // For now, we'll just return the payment request
+    res.status(201).json(paymentRequest);
+});
+
+app.get('/api/x402/pay/:id', (req, res) => {
+    // Handle the payment request
+    const { id } = req.params;
+    
+    // In a real implementation, we would retrieve the payment request from database
+    // For now, we'll return a mock response
+    const paymentDetails = {
+        id,
+        protocol: 'x402',
+        amount: 0.1,
+        currency: 'SOL',
+        description: 'Thronglet Society Premium Access',
+        recipient: 'thronglet-society',
+        status: 'ready',
+        wallet_address: 'thronglet_payment_gateway_123456789',
+        payment_methods: ['solana', 'bitcoin', 'ethereum'],
+        timestamp: new Date().toISOString()
+    };
+    
+    res.json(paymentDetails);
+});
+
+app.post('/api/x402/pay/:id', (req, res) => {
+    // Process the payment
+    const { id } = req.params;
+    const { payment_method, sender_wallet } = req.body;
+    
+    // In a real implementation, we would process the actual payment
+    // For now, we'll simulate the payment process
+    const paymentResult = {
+        id,
+        protocol: 'x402',
+        status: 'processing',
+        payment_method,
+        sender_wallet,
+        timestamp: new Date().toISOString(),
+        transaction_id: `txn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    };
+    
+    // Simulate payment processing
+    setTimeout(() => {
+        paymentResult.status = 'completed';
+        paymentResult.completed_at = new Date().toISOString();
+    }, 1000);
+    
+    res.json(paymentResult);
+});
+
+// Wallet connection endpoints
+app.post('/api/wallet/connect', (req, res) => {
+    const { wallet_type, public_key } = req.body;
+    
+    // Validate wallet connection request
+    if (!wallet_type || !public_key) {
+        return res.status(400).json({ error: 'Wallet type and public key are required' });
+    }
+    
+    // Generate a session token for the connected wallet
+    const session_token = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    // Create wallet connection record
+    const walletConnection = {
+        session_token,
+        wallet_type,
+        public_key,
+        connected_at: new Date().toISOString(),
+        status: 'connected',
+        permissions: ['read_balance', 'send_transactions', 'sign_messages']
+    };
+    
+    // In a real implementation, we would store this in a secure session store
+    res.json(walletConnection);
+});
+
+app.post('/api/wallet/disconnect', (req, res) => {
+    const { session_token } = req.body;
+    
+    // In a real implementation, we would invalidate the session
+    res.json({
+        status: 'disconnected',
+        disconnected_at: new Date().toISOString()
+    });
+});
+
+app.get('/api/wallet/balance', (req, res) => {
+    // Require wallet connection (in a real implementation, validate session token)
+    const walletType = req.query.wallet_type || 'solana';
+    
+    // Simulate balance retrieval
+    const balances = {
+        solana: {
+            wallet_type: 'solana',
+            public_key: 'thrngltSociety12345678901234567890123456789',
+            balance: 2.5,
+            currency: 'SOL',
+            decimals: 9,
+            last_updated: new Date().toISOString()
+        },
+        bitcoin: {
+            wallet_type: 'bitcoin',
+            address: 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh',
+            balance: 0.015,
+            currency: 'BTC',
+            last_updated: new Date().toISOString()
+        },
+        ethereum: {
+            wallet_type: 'ethereum',
+            address: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+            balance: 1.2,
+            currency: 'ETH',
+            last_updated: new Date().toISOString()
+        }
+    };
+    
+    res.json(balances[walletType] || balances.solana);
+});
+
+app.post('/api/wallet/transfer', (req, res) => {
+    const { from_wallet, to_address, amount, currency, session_token } = req.body;
+    
+    // Validate transfer request
+    if (!from_wallet || !to_address || !amount || !currency) {
+        return res.status(400).json({ error: 'From wallet, to address, amount, and currency are required' });
+    }
+    
+    // Simulate transaction creation
+    const transaction = {
+        id: `transfer_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        from: from_wallet,
+        to: to_address,
+        amount: parseFloat(amount),
+        currency,
+        status: 'pending',
+        timestamp: new Date().toISOString(),
+        fee: calculateNetworkFee(currency),
+        estimated_completion: new Date(Date.now() + 30000).toISOString() // 30 seconds
+    };
+    
+    // Simulate transaction processing
+    setTimeout(() => {
+        transaction.status = 'confirmed';
+        transaction.confirmed_at = new Date().toISOString();
+        transaction.explorer_url = `https://explorer.solana.com/tx/${transaction.id}`;
+    }, 2000);
+    
+    res.json(transaction);
+});
+
+// Helper function to calculate network fees
+function calculateNetworkFee(currency) {
+    const fees = {
+        'SOL': 0.000005,
+        'BTC': 0.00001,
+        'ETH': 0.0001
+    };
+    
+    return fees[currency] || 0.0001;
+}
 
 // Cross-chain transaction endpoint
 app.post('/api/dapp/cross-chain', (req, res) => {
